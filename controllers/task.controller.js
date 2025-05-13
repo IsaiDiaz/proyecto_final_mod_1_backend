@@ -23,7 +23,7 @@ exports.createTask = async (req, res) => {
 
 exports.getTasksByUserId = async (req, res) => {
     const userId = req.user.id;
-    const { status, query } = req.query;
+    const { status, query, startDate, endDate } = req.query;
 
     try {
         const whereClause = { UserId: userId };
@@ -41,6 +41,17 @@ exports.getTasksByUserId = async (req, res) => {
                         { description: { [Op.iLike]: `%${query}%` } }
                     ]
                 }
+            ];
+        }
+
+        if (startDate || endDate) {
+            const dateFilter = {};
+            if (startDate) dateFilter[Op.gte] = new Date(startDate);
+            if (endDate) dateFilter[Op.lte] = new Date(endDate);
+
+            whereClause[Op.and] = [
+                ...(whereClause[Op.and] || []),
+                { dueDate: dateFilter }
             ];
         }
 

@@ -16,10 +16,10 @@ module.exports = {
     dialect: process.env.DB_DIALECT
   },
   production: {
-    username: process.env.DB_PROD_USERNAME,
-    password: process.env.DB_PROD_PASSWORD,
+    username: process.env.PGUSER,
+    password: process.env.PGPASSWORD,
     database: process.env.DB_PROD_NAME,
-    host: process.env.DB_PROD_HOST,
+    host: process.env.PGHOST,
     dialect: process.env.DB_PROD_DIALECT
   }
 };

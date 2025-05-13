@@ -56,7 +56,7 @@ exports.createUser = async (req, res) => {
             return res.status(400).json({ message: 'El correo electrónico es obligatorio' });
         }
 
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ where : {email}  });
         if (existingUser) {
             return res.status(400).json({ message: 'El correo ya está en uso' });
         }

@@ -19,9 +19,15 @@ const generateTokens = (user) => {
 };
 
 exports.authPassword = async (req, res) => {
-    const { email, password } = req.body;
-
     try {
+        if (!req.body) {
+            return res.status(400).json({ message: 'Cuerpo de la solicitud vacío o malformado' });
+        }
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: 'El correo electrónico y la contraseña son obligatorios' });
+        }
         const user = await User.findOne({ where: { email } });
         if (!user) return res.status(401).json({ message: 'Credenciales inválidas' });
 
@@ -108,7 +114,7 @@ exports.updateUser = async (req, res) => {
 exports.refreshToken = async (req, res) => {
     try {
         const token = req.cookies.refreshToken;
-        if (!token) return res.status(401).json({ message: "No token" });
+        if (!token) return res.status(401).json({ message: "No se envió token" });
 
         const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
         const user = await User.findByPk(decoded.id);

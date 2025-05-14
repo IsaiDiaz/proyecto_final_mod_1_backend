@@ -9,7 +9,7 @@ exports.createTask = async (req, res) => {
             title,
             description: description || null,
             dueDate: dueDate || null,
-            status,
+            status: status || 'pending',
             UserId: req.user.id,
         });
 
@@ -117,6 +117,9 @@ exports.getTodayTasksByUserId = async (req, res) => {
 exports.updateTask = async (req, res) => {
     const { id } = req.params;
     const task = await Task.findByPk(id);
+    if (task.UserId !== req.user.id){
+        return res.status(403).json({ message: 'No tienes permiso para modificar esta tarea' });
+    }
     if (!task) {
         return res.status(404).json({ message: 'Tarea no encontrada' });
     }
@@ -129,6 +132,10 @@ exports.updateProgress = async (req, res) => {
 
     try {
         const task = await Task.findByPk(id);
+
+        if (task.UserId !== req.user.id){
+            return res.status(403).json({ message: 'No tienes permiso para modificar esta tarea' });
+        }
 
         if (!task) {
             return res.status(404).json({ message: 'Tarea no encontrada' });
@@ -164,6 +171,14 @@ exports.deleteTask = async (req, res) => {
     const task = await Task.findByPk(id);
     if (!task) {
         return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+
+    if (task.UserId !== req.user.id){
+        return res.status(403).json({ message: 'No tienes permiso para eliminar esta tarea' });
+    }
+
+    if (task.status !== 'done') {
+        return res.status(400).json({ message: 'No se puede eliminar una tarea que no está completada' });
     }
     await task.destroy();
     res.status(204).send();
